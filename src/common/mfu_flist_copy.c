@@ -2311,10 +2311,15 @@ static void mfu_sync_all(const char* msg)
     if (rank == 0) {
         MFU_LOG(MFU_LOG_INFO, "%s", msg);
     }
+    MFU_LOG(MFU_LOG_INFO, "BLAKE: sync before");
     sync();
+    MFU_LOG(MFU_LOG_INFO, "BLAKE: sync after");
 
+    MFU_LOG(MFU_LOG_INFO, "BLAKE: barrier before");
     MPI_Barrier(MPI_COMM_WORLD);
+    MFU_LOG(MFU_LOG_INFO, "BLAKE: barrier after");
     double end = MPI_Wtime();
+    MFU_LOG(MFU_LOG_INFO, "BLAKE: time after");
 
     if (rank == 0) {
         MFU_LOG(MFU_LOG_INFO, "Sync completed in %.3lf seconds.", (end - start));
