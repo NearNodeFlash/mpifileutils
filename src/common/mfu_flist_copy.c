@@ -947,6 +947,21 @@ static int mfu_copy_set_metadata_dirs(
     return rc;
 }
 
+static void print_stat(mode_t mode) {
+  MFU_LOG(MFU_LOG_DBG, "   Permissions (octal): %o\n", mode & 0777);
+
+  // Isolate non-permission bits
+  mode_t non_permission_bits = mode & ~(S_IRUSR | S_IWUSR | S_IXUSR |
+                                       S_IRGRP | S_IWGRP | S_IXGRP |
+                                       S_IROTH | S_IWOTH | S_IXOTH);
+  if (non_permission_bits != 0) {
+    MFU_LOG(MFU_LOG_DBG, "   Non-permission bits (octal): %o\n", non_permission_bits);
+  } else {
+    MFU_LOG(MFU_LOG_DBG, "   No non-permission bits set.\n");
+  }
+}
+
+
 /* creates dir in destpath for specified item, identifies source path
  * that contains source dir, computes relative path to dir under source path,
  * and creates dir at same relative path under destpath, optionally copies
@@ -1000,6 +1015,23 @@ static int mfu_create_directory(
     /* create the destination directory */
     MFU_LOG(MFU_LOG_DBG, "Creating directory `%s'", dest_path);
     int mkdir_rc = mfu_file_mkdir(dest_path, DCOPY_DEF_PERMS_DIR, mfu_dst_file);
+
+    // TODO: Debug; Remove this
+    // Stat the directory
+    struct stat st;
+    int stat_rc = mfu_stat(dest_path, &st);
+    MFU_LOG(MFU_LOG_DBG, "TEST: Running stat on '%s'", dest_path);
+    if(stat_rc < 0) {
+        MFU_LOG(MFU_LOG_ERR, "TEST: could not stat '%s' (errno=%d %s)", dest_path, errno, strerror(errno));
+    } else {
+        MFU_LOG(MFU_LOG_DBG, "TEST: statbuf: '%s'", dest_path);
+        MFU_LOG(MFU_LOG_DBG, "   mode: %o", st.st_mode);
+        print_stat(st.st_mode);
+        MFU_LOG(MFU_LOG_DBG, "   UID: %d", st.st_uid);
+        MFU_LOG(MFU_LOG_DBG, "   GID: %d", st.st_gid);
+        MFU_LOG(MFU_LOG_DBG, "   numLinks: %d", st.st_nlink);
+    }
+
     if(mkdir_rc < 0) {
         if(errno == EEXIST) {
             MFU_LOG(MFU_LOG_WARN,
@@ -1110,6 +1142,8 @@ static int mfu_create_directories(
                         paths, destpath, copy_opts, mfu_src_file, mfu_dst_file);
                 if (tmp_rc < 0) {
                     rc = -1;
+                    MFU_LOG(MFU_LOG_ERR, "TEST: Error creating directory, rc: %d, destpath: %s, dst_file: %s", tmp_rc, destpath, mfu_dst_file);
+                    return rc;
                 }
 
                 /* update our running count for progress messages */
@@ -2491,7 +2525,10 @@ int mfu_flist_copy(
     int tmp_rc = mfu_create_directories(levels, minlevel, lists, numpaths,
             paths, destpath, copy_opts, mfu_src_file, mfu_dst_file);
     if (tmp_rc < 0) {
+        // TODO: make this error consistent
+        MFU_LOG(MFU_LOG_ERR, "Error creating directories, rc: %d", tmp_rc);
         rc = -1;
+        return rc;
     }
 
     /* operate on files in batches if batch size is given */
@@ -3145,7 +3182,10 @@ int mfu_flist_hardlink(
     int tmp_rc = mfu_create_directories(levels, minlevel, lists, 1,
             srcpath, destpath, copy_opts, mfu_src_file, mfu_dst_file);
     if (tmp_rc < 0) {
+        // TODO: make this error consistent
+        MFU_LOG(MFU_LOG_ERR, "Error creating directories, rc: %d", tmp_rc);
         rc = -1;
+        return rc;
     }
 
     /* FIXME: To be consistent with a normal copy, let's go ahead and try
