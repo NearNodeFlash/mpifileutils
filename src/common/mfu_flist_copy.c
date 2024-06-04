@@ -2533,7 +2533,7 @@ int mfu_flist_copy(
         // TODO: make this error consistent
         MFU_LOG(MFU_LOG_ERR, "Error creating directories, rc: %d", tmp_rc);
         rc = -1;
-        return rc;
+        // return rc;
     }
 
     /* operate on files in batches if batch size is given */
