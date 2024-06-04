@@ -1016,6 +1016,20 @@ static int mfu_create_directory(
     MFU_LOG(MFU_LOG_DBG, "Creating directory `%s'", dest_path);
     int mkdir_rc = mfu_file_mkdir(dest_path, DCOPY_DEF_PERMS_DIR, mfu_dst_file);
 
+    if(mkdir_rc < 0) {
+        if(errno == EEXIST) {
+            MFU_LOG(MFU_LOG_WARN,
+                    "Original directory exists, skip the creation: `%s' (errno=%d %s)",
+                    dest_path, errno, strerror(errno));
+
+        } else {
+            MFU_LOG(MFU_LOG_ERR, "Create `%s' mkdir() failed (errno=%d %s)",
+                    dest_path, errno, strerror(errno)
+            );
+            // don't quit just yet, do the stat
+        }
+    }
+
     // TODO: Debug; Remove this
     // Stat the directory
     struct stat st;
@@ -1032,19 +1046,10 @@ static int mfu_create_directory(
         MFU_LOG(MFU_LOG_DBG, "   numLinks: %d", st.st_nlink);
     }
 
+    // quit if mkdir failed
     if(mkdir_rc < 0) {
-        if(errno == EEXIST) {
-            MFU_LOG(MFU_LOG_WARN,
-                    "Original directory exists, skip the creation: `%s' (errno=%d %s)",
-                    dest_path, errno, strerror(errno));
-
-        } else {
-            MFU_LOG(MFU_LOG_ERR, "Create `%s' mkdir() failed (errno=%d %s)",
-                    dest_path, errno, strerror(errno)
-            );
-            mfu_free(&dest_path);
-            return -1;
-        }
+        MFU_LOG(MFU_LOG_ERR, "TEST: mkdir failed, done");
+        return -1;
     }
 
     /* we do this now in case there are Lustre attributes for
@@ -1142,7 +1147,7 @@ static int mfu_create_directories(
                         paths, destpath, copy_opts, mfu_src_file, mfu_dst_file);
                 if (tmp_rc < 0) {
                     rc = -1;
-                    MFU_LOG(MFU_LOG_ERR, "TEST: Error creating directory, rc: %d, destpath: %s, dst_file: %s", tmp_rc, destpath, mfu_dst_file);
+                    MFU_LOG(MFU_LOG_ERR, "TEST: Error creating directory, rc: %d, destpath: %s", tmp_rc, destpath);
                     return rc;
                 }
 
