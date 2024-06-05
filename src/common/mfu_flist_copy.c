@@ -1015,6 +1015,8 @@ static int mfu_create_directory(
     /* create the destination directory */
     MFU_LOG(MFU_LOG_DBG, "Creating directory `%s'", dest_path);
     int mkdir_rc = mfu_file_mkdir(dest_path, DCOPY_DEF_PERMS_DIR, mfu_dst_file);
+    int mkdir_errno = errno;
+    bool mkdir_error = false;
 
     if(mkdir_rc < 0) {
         if(errno == EEXIST) {
@@ -1026,6 +1028,7 @@ static int mfu_create_directory(
             MFU_LOG(MFU_LOG_ERR, "Create `%s' mkdir() failed (errno=%d %s)",
                     dest_path, errno, strerror(errno)
             );
+            mkdir_error = true;
             // don't quit just yet, do the stat
         }
     }
@@ -1034,7 +1037,7 @@ static int mfu_create_directory(
     // Stat the directory
     struct stat st;
     int stat_rc = mfu_stat(dest_path, &st);
-    MFU_LOG(MFU_LOG_DBG, "TEST (v2.0.1): Running stat on '%s'", dest_path);
+    MFU_LOG(MFU_LOG_DBG, "TEST: Running stat on '%s'", dest_path);
     if(stat_rc < 0) {
         MFU_LOG(MFU_LOG_ERR, "TEST: could not stat '%s' (errno=%d %s)", dest_path, errno, strerror(errno));
     } else {
@@ -1047,7 +1050,7 @@ static int mfu_create_directory(
     }
 
     // quit if mkdir failed
-    if(mkdir_rc < 0) {
+    if(mkdir_error) {
         MFU_LOG(MFU_LOG_ERR, "TEST: mkdir failed, done");
         return -1;
     }
@@ -1067,7 +1070,7 @@ static int mfu_create_directory(
     mfu_copy_stats.total_dirs++;
 
     /* free the directory name */
-    mfu_free(&dest_path);
+    // mfu_free(&dest_path);
 
     return rc;
 }
