@@ -948,16 +948,16 @@ static int mfu_copy_set_metadata_dirs(
 }
 
 static void print_stat(mode_t mode) {
-  MFU_LOG(MFU_LOG_DBG, "   Permissions (octal): %o\n", mode & 0777);
+  MFU_LOG(MFU_LOG_DBG, "   Permissions (octal): %o", mode & 0777);
 
   // Isolate non-permission bits
   mode_t non_permission_bits = mode & ~(S_IRUSR | S_IWUSR | S_IXUSR |
                                        S_IRGRP | S_IWGRP | S_IXGRP |
                                        S_IROTH | S_IWOTH | S_IXOTH);
   if (non_permission_bits != 0) {
-    MFU_LOG(MFU_LOG_DBG, "   Non-permission bits (octal): %o\n", non_permission_bits);
+    MFU_LOG(MFU_LOG_DBG, "   Non-permission bits (octal): %o", non_permission_bits);
   } else {
-    MFU_LOG(MFU_LOG_DBG, "   No non-permission bits set.\n");
+    MFU_LOG(MFU_LOG_DBG, "   No non-permission bits set.");
   }
 }
 
@@ -1034,7 +1034,7 @@ static int mfu_create_directory(
     // Stat the directory
     struct stat st;
     int stat_rc = mfu_stat(dest_path, &st);
-    MFU_LOG(MFU_LOG_DBG, "TEST (v2.0): Running stat on '%s'", dest_path);
+    MFU_LOG(MFU_LOG_DBG, "TEST (v2.0.1): Running stat on '%s'", dest_path);
     if(stat_rc < 0) {
         MFU_LOG(MFU_LOG_ERR, "TEST: could not stat '%s' (errno=%d %s)", dest_path, errno, strerror(errno));
     } else {
@@ -1148,7 +1148,7 @@ static int mfu_create_directories(
                 if (tmp_rc < 0) {
                     rc = -1;
                     MFU_LOG(MFU_LOG_ERR, "TEST: Error creating directory, rc: %d, destpath: %s", tmp_rc, destpath);
-                    return rc;
+                    // return rc;
                 }
 
                 /* update our running count for progress messages */
@@ -3190,7 +3190,7 @@ int mfu_flist_hardlink(
         // TODO: make this error consistent
         MFU_LOG(MFU_LOG_ERR, "Error creating directories, rc: %d", tmp_rc);
         rc = -1;
-        return rc;
+        // return rc;
     }
 
     /* FIXME: To be consistent with a normal copy, let's go ahead and try
