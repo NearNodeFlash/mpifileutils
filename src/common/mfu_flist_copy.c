@@ -1034,7 +1034,7 @@ static int mfu_create_directory(
     // Stat the directory
     struct stat st;
     int stat_rc = mfu_stat(dest_path, &st);
-    MFU_LOG(MFU_LOG_DBG, "TEST: Running stat on '%s'", dest_path);
+    MFU_LOG(MFU_LOG_DBG, "TEST (v2.0): Running stat on '%s'", dest_path);
     if(stat_rc < 0) {
         MFU_LOG(MFU_LOG_ERR, "TEST: could not stat '%s' (errno=%d %s)", dest_path, errno, strerror(errno));
     } else {
