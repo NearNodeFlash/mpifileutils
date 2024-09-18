@@ -2176,7 +2176,7 @@ static int mfu_copy_files(
 
         // Cause a segfault
         MFU_LOG(MFU_LOG_INFO, "BLAKE: should I cause a segfault?");
-        if copy_opts->crash && i > 5 {
+        if (copy_opts->crash && i > 5) {
             MFU_LOG(MFU_LOG_INFO, "BLAKE: I should!");
             *((char *) NULL) = 0;
         }
