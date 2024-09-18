@@ -100,7 +100,6 @@ void print_usage(void)
     printf("  -v, --verbose            - verbose output\n");
     printf("  -q, --quiet              - quiet output\n");
     printf("  -h, --help               - print usage\n");
-    printf("  -Z, --cras               - cause a segfault\n");
     printf("For more information see https://mpifileutils.readthedocs.io.\n");
     printf("\n");
     fflush(stdout);
@@ -170,7 +169,6 @@ int main(int argc, char** argv)
         {"verbose"              , no_argument      , 0, 'v'},
         {"quiet"                , no_argument      , 0, 'q'},
         {"help"                 , no_argument      , 0, 'h'},
-        {"crash"                , no_argument      , 0, 'Z'},
         {0                      , 0                , 0, 0  }
     };
 
@@ -347,9 +345,6 @@ int main(int argc, char** argv)
                 /* since process won't be printed in quiet anyway,
                  * disable the algorithm to save some overhead */
                 mfu_progress_timeout = 0;
-                break;
-            case 'Z':
-                mfu_copy_opts->crash = true;
                 break;
             case 'h':
                 usage = 1;
