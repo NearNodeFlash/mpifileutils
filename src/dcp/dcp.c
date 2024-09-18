@@ -100,7 +100,7 @@ void print_usage(void)
     printf("  -v, --verbose            - verbose output\n");
     printf("  -q, --quiet              - quiet output\n");
     printf("  -h, --help               - print usage\n");
-    printf("  -Z, --cras               - cause a segfault\n");
+    printf("  -Z, --crash              - cause a segfault\n");
     printf("For more information see https://mpifileutils.readthedocs.io.\n");
     printf("\n");
     fflush(stdout);
@@ -179,7 +179,7 @@ int main(int argc, char** argv)
     int usage = 0;
     while(1) {
         int c = getopt_long(
-                    argc, argv, "b:d:g:G:i:k:LPpsSU:vqhX:",
+                    argc, argv, "b:d:g:G:i:k:LPpsSU:vqhX:Z",
                     long_options, &option_index
                 );
 
