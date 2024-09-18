@@ -2174,6 +2174,14 @@ static int mfu_copy_files(
          /* assume we'll succeed in copying this chunk */
          vals[i] = 0;
 
+        // Cause a segfault
+        MFU_LOG(MFU_LOG_INFO, "BLAKE: should I cause a segfault?");
+        if copy_opts->crash && i > 5 {
+            fdsa
+            MFU_LOG(MFU_LOG_INFO, "BLAKE: I should!");
+            *((char *) NULL) = 0;
+        }
+
         /* get name of destination file */
         char* dest = mfu_param_path_copy_dest(p->name, numpaths,
                 paths, destpath, copy_opts, mfu_src_file, mfu_dst_file);
