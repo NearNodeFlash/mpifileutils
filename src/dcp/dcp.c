@@ -404,7 +404,8 @@ int main(int argc, char** argv)
     /* setgroups before set gid or uid */
     if (egid > 0 || euid > 0) {
         /* record the original groups */
-        if (getgroups(MAX_GIDS, &gids) < 0) {
+        gids_count = getgroups(MAX_GIDS, &gids);
+        if (gids_count < 0) {
             MFU_LOG(MFU_LOG_ERR, "Could not getgroups: %s", strerror(errno));
             mfu_finalize();
             MPI_Finalize();
