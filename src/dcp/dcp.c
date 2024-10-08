@@ -403,15 +403,21 @@ int main(int argc, char** argv)
 
     /* setgroups before set gid or uid */
     if (egid > 0 || euid > 0) {
+        /* record the original groups */
+        if (getgroups(MAX_GIDS, &gids) < 0) {
+            MFU_LOG(MFU_LOG_ERR, "Could not getgroups: %s", strerror(errno));
+            mfu_finalize();
+            MPI_Finalize();
+            return 1;
+        }
+
+        /* clear groups */
         if (setgroups(0, NULL) < 0) {
             MFU_LOG(MFU_LOG_ERR, "Could not setgroups: %s", strerror(errno));
             mfu_finalize();
             MPI_Finalize();
             return 1;
         }
-
-        /* record the original groups */
-        getgroups(MAX_GIDS, &gids);
     }
 
     /* set egid */
